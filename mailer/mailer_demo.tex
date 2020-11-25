@@ -1,0 +1,118 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Python Cheat Sheet
+% baposter Landscape Poster
+% LaTeX Template
+% Version 1.0 (11/06/13)
+% baposter Class Created by:
+% Brian Amberg (baposter@brian-amberg.de)
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+% Edited by Michelle Cristina de Sousa Baltazar
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------
+
+
+\documentclass[paperwidth=11in,paperheight=8.5in,fontscale=1]{baposter} % Adjust the font scale/size here
+\usepackage{siunitx}
+\usepackage[fleqn]{amsmath}
+\usepackage{graphicx}
+\usepackage{mathrsfs}
+\usepackage{makecell}
+\usepackage{amssymb}
+\usepackage{hyperref}
+
+
+\usepackage{etoolbox}
+\newcommand{\zerodisplayskips}{%
+  \setlength{\abovedisplayskip}{0pt}%
+  \setlength{\belowdisplayskip}{0pt}%
+  \setlength{\abovedisplayshortskip}{0pt}%
+  \setlength{\belowdisplayshortskip}{0pt}}
+\appto{\normalsize}{\zerodisplayskips}
+\appto{\small}{\zerodisplayskips}
+\appto{\footnotesize}{\zerodisplayskips}
+
+\renewcommand\vec{\mathbf}
+\renewcommand{\arraystretch}{0.6}
+
+\def\bbm{\begin{bmatrix}}
+\def\ebm{\end{bmatrix}}
+
+
+\begin{document}
+
+\begin{poster}{
+  headerheight=0pt,
+  columns=3,
+  background=none,
+  linewidth=1pt,
+  borderColor=black,
+%   textborder=rectangle,
+  headershape=smallrounded,
+  headerfont={},
+%   below=notset,
+  height=0.45,
+  boxshade=plain,
+  eyecatcher=false,
+  boxheaderheight=1.5em,
+  boxColorOne=white,
+  headerColorOne=white,
+  headershade=none,
+  colspacing=4pt
+}
+{
+} % No eyecatcher
+{
+Your Water Usage and You 
+} % Title
+{
+John Akagi
+}
+{
+} % No Logo
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{posterbox}[column=0,row=.05,span=1,textborder=rounded,headerborder=open,height=.6,name=misc,textfont=\footnotesize, boxheaderheight=.25in]{ Every Time You ...}
+
+\begin{minipage}[b][][b]{.24\textwidth}
+		\includegraphics[width=\textwidth]{ClothesWasher_icon.png}
+\end{minipage}
+\begin{minipage}[b][][b]{.24\textwidth}
+		\includegraphics[width=\textwidth]{Shower_icon.png}
+\end{minipage}
+\begin{minipage}[b][][b]{.24\textwidth}
+		\includegraphics[width=\textwidth]{Toilet_icon.png}
+\end{minipage}
+\begin{minipage}[b][][b]{.24\textwidth}
+		\includegraphics[width=\textwidth]{Faucet_icon.png}
+\end{minipage}
+
+
+
+\end{posterbox}
+
+
+\begin{posterbox}[column=0,row=.8,span=2,textborder=rounded,headerborder=open,height=.2,name=misc,textfont=\footnotesize, boxheaderheight=.25in]{\footnotesize Resources}
+
+Water Cost: \url{https://www.loganutah.org/government/departments/public_works/water_and_waste_water/rates.php}\\
+Irrigation Usage: \url{https://blog.lawneq.com/calculating-lawn-irrigation-water-usage-and-costs/}\\
+\-\phantom{Irrigation Usage:} \url{https://todayshomeowner.com/calculating-lawn-irrigation-costs/}\\
+When to Water: \url{https://www.lawndoctor.com/blog/how-to-water-lawn/}\\
+Shower Flow: \url{https://www.epa.gov/watersense/showerheads}
+
+
+\end{posterbox}
+
+
+
+
+
+\end{poster}
+
+
+\end{document}
