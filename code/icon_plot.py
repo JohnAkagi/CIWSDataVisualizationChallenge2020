@@ -95,8 +95,9 @@ def icon_plot(amount):
         
     else:
         ax[row_idx,col_idx].axis('off')
-        
-    fig.tight_layout(rect=[0, 0.03, 1, 0.95])
+    
+    bottom = .125/(rows+1)
+    fig.tight_layout(rect=[0, bottom, 1, 0.95])
     plt.subplots_adjust(wspace=0, hspace=0)
     return(fig, ax)
         

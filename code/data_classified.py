@@ -16,7 +16,20 @@ class data_classified:
         
         self.data_start = self.df['DateTimeStart'].min()
         self.data_end = self.df['DateTimeStart'].max()
-        self.data_duration = self.data_end - self.data_start
+        days = (self.data_end - self.data_start).days
+        seconds = (self.data_end - self.data_start).seconds
+        self.data_duration = days + seconds/(24*3600)
+        
+        # Ideal values
+        self.ideal_toilet_gpf = 1.28
+        self.moderate_toilet_gpf = 1.6
+        self.ideal_faucet_gpm = 1.5
+        self.ideal_shower_gpm = 2.0
+        self.ideal_shower_duration = 5.0
+        
+        # Water cost (Logan)
+        cost_kgal = 1.42
+        self.cost_gal = cost_kgal/1000.0
     
     def import_classified(self, file):
         ''' Imports the data classified by events '''
@@ -34,11 +47,7 @@ class data_classified:
         seconds = class_data['DateTimeEnd'].dt.second/3600.0
         class_data['Hour_End'] = class_data['DateTimeEnd'].dt.hour + minutes + seconds
         
-
-        
         values = class_data.columns
-        
-        
         
         # Format the measurements with a space between the description and unit
         for val in values:
@@ -121,8 +130,11 @@ class data_classified:
         return(results)
         
         
-    def equivalent_lawn(self, actual_acre):
-        ''' Calculate what area of grass could be irrigated assuming .623 gal/week/sqft '''
+    def get_irrigation_gpm(self, actual_acre):
+        ''' Calculate water used as irrigation per month and compares that to an ideal value based on acrage
+            Also calculates how much land you could water with current consumption but not currently used 
+            Assumes .623 gal/sqft '''        
+            
         sqft2acre = 1/43560.0
         acre2sqft = 1/sqft2acre
         
@@ -140,26 +152,168 @@ class data_classified:
         actual_sqft = actual_acre * acre2sqft
         ideal_usage = actual_sqft * .623 * n_time / 7.0 # sqft * (.623 gal/ week*sqft)*days*(1 week/7 days)
         
+        # Calculate monthly usage
+        month_usage = total_gal*30/n_time # Gallons/month
+        ideal_month_usage = ideal_usage*30/n_time # Gallons/month
+        
+        # Calculate potential savings
+        gal_saved_month = month_usage - ideal_month_usage
+        dollar_saved = gal_saved_month*self.cost_gal
+        
         results = {}
-        results['Actual Usage (gal)'] = total_gal
-        results['Ideal Usage (gal)'] = ideal_usage
-        results['Actual Area (acre)'] = actual_acre
-        results['Equivalent Area (acre)'] = equiv_acre
+        results['Name'] = 'Irrigation Usage'
+        results['Units'] = 'Gallons per Month'
+        results['Actual Usage (gal)'] = month_usage
+        results['Ideal Usage (gal)'] = ideal_month_usage
+        results['Potential Savings ($)'] = dollar_saved
+        results['Potential Savings (gal)'] = gal_saved_month
+        #results['Actual Area (acre)'] = actual_acre
+        #results['Equivalent Area (acre)'] = equiv_acre
 
         return results
     
     def get_shower_gpm(self):
         
-        ideal_gpm = 2.0
         
-        shower_df = self.df.groupby('Label').get_group('Shower')
-        mean_gpm = shower_df['Flowrate (gpm)']
+        shower_df = self.df.groupby('Label').get_group('Shower').copy()
+        mean_gpm = shower_df['Flowrate (gpm)'].mean()
+        
+        (dollar_saved_month, gal_saved_month) = self.calc_flow_savings(shower_df, self.ideal_shower_gpm)
         
         results = {}
+        results['Name'] = 'Shower Flowrate'
+        results['Units'] = 'Gallons per Minute'
         results['Actual Flowrate (gpm)'] = mean_gpm
-        results['Ideal Flowrate (gpm)'] = ideal_gpm
+        results['Ideal Flowrate (gpm)'] = self.ideal_shower_gpm
+        results['Potential Savings ($)'] = dollar_saved_month
+        results['Potential Savings (gal)'] = gal_saved_month
         
         return(results)
+        
+    def get_shower_time(self):
+        shower_df = self.df.groupby('Label').get_group('Shower').copy()
+        mean_gpm = shower_df['Duration (min)'].mean()
+        
+        (dollar_saved_month, gal_saved_month) = self.calc_time_savings(shower_df, self.ideal_shower_duration)
+        
+        results = {}
+        results['Name'] = 'Shower Duration'
+        results['Units'] = 'Minutes'
+        results['Actual Duration (min)'] = mean_gpm
+        results['Ideal Duration (min)'] = self.ideal_shower_duration
+        results['Potential Savings ($)'] = dollar_saved_month
+        results['Potential Savings (gal)'] = gal_saved_month
+        
+        return(results)
+        
+    def get_faucet_gpm(self):
+        
+        
+        faucet_df = self.df.groupby('Label').get_group('Faucet').copy()
+        mean_gpm = faucet_df['Flowrate (gpm)'].mean()
+        
+        (dollar_saved_month, gal_saved_month) = self.calc_flow_savings(faucet_df, self.ideal_faucet_gpm )
+        
+        
+        results = {}
+        results['Name'] = 'Faucet Flowrate'
+        results['Units'] = 'Gallons per Minute'
+        results['Actual Flowrate (gpm)'] = mean_gpm
+        results['Ideal Flowrate (gpm)'] = self.ideal_faucet_gpm 
+        results['Potential Savings ($)'] = dollar_saved_month
+        results['Potential Savings (gal)'] = gal_saved_month
+        
+        return(results)
+        
+    def get_toilet_gpf(self):
+        
+        toilet_df = self.df.groupby('Label').get_group('Toilet').copy()
+        mean_gal = toilet_df['Volume (gal)'].mean()
+        
+        (dollar_saved_month, gal_saved_month) = self.calc_vol_savings(toilet_df, self.ideal_toilet_gpf)
+        
+        results = {}
+        results['Name'] = 'Toilet'
+        results['Units'] = 'Gallons per Flush'
+        results['Actual Usage (gal/flush)'] = mean_gal
+        results['Ideal Usage (gal/flush)'] = self.ideal_toilet_gpf
+        results['Typical Usage (gal/flush)'] = self.moderate_toilet_gpf
+        results['Potential Savings ($)'] = dollar_saved_month
+        results['Potential Savings (gal)'] = gal_saved_month
+        
+        return(results)
+        
+    def calc_vol_savings(self, df, ideal_vol):
+        ''' Calculates the savings over month if volume for each event is capped'''
+        
+        df['IdealVolume'] = df['Volume (gal)']
+        df.loc[df['IdealVolume'] > ideal_vol, 'IdealVolume'] = ideal_vol
+        ideal_gal = df['IdealVolume'].sum()
+        actual_gal = df['Volume (gal)'].sum()
+        diff_gal = actual_gal - ideal_gal
+        dollar_saved = diff_gal*self.cost_gal
+        dollar_saved_month = dollar_saved*30/self.data_duration
+        diff_gal_month = diff_gal*30/self.data_duration
+        
+        return(dollar_saved_month, diff_gal_month)
+        
+    def calc_flow_savings(self, df, ideal_flow):
+        ''' Calculates the savings over a month if flow for each event is capped '''
+        
+        df['IdealFlow'] = df['Flowrate (gpm)']
+        df.loc[df['IdealFlow'] > ideal_flow, 'IdealFlow'] = ideal_flow
+        df['IdealVol'] = df['IdealFlow']*df['Duration (min)']
+        ideal_gal = df['IdealVol'].sum()
+        actual_gal = df['Volume (gal)'].sum()
+        diff_gal = actual_gal - ideal_gal
+        dollar_saved = diff_gal*self.cost_gal
+        dollar_saved_month = dollar_saved*30/self.data_duration
+        diff_gal_month = diff_gal*30/self.data_duration
+        
+        return(dollar_saved_month, diff_gal_month)
+        
+    def calc_time_savings(self, df, max_time):
+        ''' Calculates the savings over a month if duration for each event is capped '''
+        
+        df['IdealDuration'] = df['Duration (min)']
+        df.loc[df['IdealDuration'] > max_time, 'IdealDuration'] = max_time
+        df['IdealVol'] = df['Flowrate (gpm)']*df['IdealDuration']
+        ideal_gal = df['IdealVol'].sum()
+        actual_gal = df['Volume (gal)'].sum()
+        diff_gal = actual_gal - ideal_gal
+        dollar_saved = diff_gal*self.cost_gal
+        dollar_saved_month = dollar_saved*30/self.data_duration
+        diff_gal_month = diff_gal*30/self.data_duration
+        
+        return(dollar_saved_month, diff_gal_month)
+        
+        
+    def calc_dt_savings(self, df, dt):
+        ''' Calculates the savings if duration is cut down by dt (min) '''
+        
+        df['IdealDuration'] = df['Duration (min)'] - dt
+        df.loc[df['IdealDuration'] < 0, 'IdealDuration'] = 0
+        df['IdealVol'] = df['Flowrate (gpm)']*df['IdealDuration']
+        ideal_gal = df['IdealVol'].sum()
+        actual_gal = df['Volume (gal)'].sum()
+        diff_gal = actual_gal - ideal_gal
+        dollar_saved = diff_gal*self.cost_gal
+        dollar_saved_month = dollar_saved*30/self.data_duration
+        diff_gal_month = diff_gal*30/self.data_duration
+        
+        return(dollar_saved_month, diff_gal_month)
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         
         
         
