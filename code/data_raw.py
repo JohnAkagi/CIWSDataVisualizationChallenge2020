@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Oct 26 23:04:38 2020
+The data_raw class imports the raw data
 
-@author: johna
 """
 
 
@@ -12,17 +11,18 @@ class data_raw:
     def __init__(self, file):
         self.df = self.import_raw(file)
         
-    def import_raw():
+    def import_raw(file):
         ''' Imports and prepares the raw data '''
         
-        raw_data = pd.read_csv('../data/Raw_Data.csv',header=3)
+        raw_data = pd.read_csv(file,header=3)
         
         # Get the pulse to gallon conversion
-        with open('../data/Raw_Data.csv','r') as f:
+        with open(file,'r') as f:
             f.readline()
             f.readline()
-            data = f.readline()
+            data = f.readline() # Conversion exists on the third line
             
+        # Get the numeric value for conversion
         split_data = data.split()
         conversion = float(split_data[2])
         

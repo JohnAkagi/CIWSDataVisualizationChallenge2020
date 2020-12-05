@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Nov 23 22:13:05 2020
+This file produces all the plots that can be found in the Results folder
 
-@author: johna
+This is the main file that should be run to generate the plots
 """
 import data_processing as dat
 
@@ -14,8 +14,8 @@ from data_classified import data_classified
 
 if __name__ == "__main__":
     
-    filepath = '../mailer'
-    plot_acre = .28
+    filepath = '../results'
+    plot_acre = .28 # Acerage of the plot in consideration
     
     # Get data from file
     file = "../data/Classified_Events.csv"

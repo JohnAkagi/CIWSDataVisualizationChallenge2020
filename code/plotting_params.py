@@ -2,7 +2,6 @@
 """
 This file contains parameters that are used in data_processing.py for plotting
 
-@author: John Akagi
 """
 
 # Set fontsizes 

@@ -1,15 +1,26 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Oct 26 19:58:03 2020
-
-@author: johna
+Given a volume of water in gallons, this will generate a graphical representation
+of that volume using gallon jugs. The amounts are rounded to the nearest 
+quarter gallon
 """
 import matplotlib.pyplot as plt
 import numpy as np
 
 
 def icon_plot(amount):
-    ''' Plots the amount in gallons using gallon icons. Rounds to nearest 1/4 '''
+    ''' 
+    Plots the amount in gallons using gallon icons. Rounds to nearest 1/4 gallon
+    
+    Args:
+        amount: Amount of water to be visualized in gallons
+        
+    Returns:
+        Figure and Axes array showing the amount of water visualized as gallon jugs
+        Further processing is needed on these to get labels, titles, etc.
+        For this project, that processing is done by the generate_icon_plots
+        function in the data_processing.py file
+    '''
     
     # Read in the images used with the plots
     gal = plt.imread('../images/gallon.png')
@@ -41,6 +52,7 @@ def icon_plot(amount):
     fig, ax = plt.subplots(rows,columns,figsize=(columns,rows+1))
     
     # If an extra row was added to appease matplotlib, turn off all the axes
+    # Otherwise, axes will be turned off when the image is plotted
     if empty_top == True:
         for col_idx in np.arange(columns-1,-1,-1):
             ax[0,col_idx].axis('off')
@@ -96,9 +108,13 @@ def icon_plot(amount):
     else:
         ax[row_idx,col_idx].axis('off')
     
+    # Adjust plot so that there is room for a title and x label
+    # Labels are not added in this function but space is made that they can be
+    # added later
     bottom = .125/(rows+1)
     fig.tight_layout(rect=[0, bottom, 1, 0.95])
     plt.subplots_adjust(wspace=0, hspace=0)
+    
     return(fig, ax)
         
 if __name__ == "__main__":
