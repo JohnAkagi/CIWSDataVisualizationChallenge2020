@@ -15,6 +15,27 @@ import matplotlib.dates as mdates
 from icon_plot import icon_plot
 import plotting_params as param 
 
+def plot_pie(df, savefile):
+    """
+    Plot a pie chart showing water usage.
+    
+    Args:
+        df: Pandas dataframe that contains classified events
+        savefile: Location to save plot
+        
+    """
+    
+    df_vol_sum = df.groupby('Label').sum()['Volume (gal)']
+
+    fig, ax = plt.subplots(figsize=(6,5))
+    patches, texts = ax.pie(df_vol_sum,startangle=90)
+    plt.legend(patches, df_vol_sum.index, loc="lower left",fontsize=param.text_fontsize)
+    fig.suptitle('Water Usage',fontsize=param.title_fontsize)
+    fig.tight_layout()
+    
+    filename = "{}/pie_chart.png".format(savefile).replace(" ","")
+    fig.savefig(filename,format='png')
+
 
 def plot_means(df):
     """

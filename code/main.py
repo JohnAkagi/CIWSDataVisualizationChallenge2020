@@ -24,6 +24,9 @@ if __name__ == "__main__":
     # Plot means using icons and save
     dat.generate_icon_plots(classified_data.indoor_df, filepath)
     
+    # Plot pie chart of all water sources
+    dat.plot_pie(classified_data.df,filepath)
+    
     # Plot irrigation times
     irr_times = classified_data.irrigation_times()
     dat.plot_water_times(irr_times, filepath)
