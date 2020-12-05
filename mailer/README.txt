@@ -1,3 +1,1 @@
-The 'mailer' folder contains all the images and files needed to create the demo mailer.
-
-Any images or plots saved from the code are by default saved to this folder.
+This folder contains a copy of the images produced by the code as well as some samples showing how those images could be used to create a mailer or flier that could be sent to customers (e.g. as part of their water bill)
